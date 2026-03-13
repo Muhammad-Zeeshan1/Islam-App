@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Education - Complete Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1a2a3a;
+            --bg-secondary: #0f2027;
+            --bg-dark: #050d13;
+            --accent-gold: #c9a227;
+            --accent-gold-light: #e8d5a3;
+            --text-light: #f5f1e8;
+            --text-muted: #b8c5d0;
+            --card-bg: rgba(26, 42, 58, 0.92);
+            --border-color: rgba(201, 162, 39, 0.3);
+            --glow-green: #2d9b6a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: var(--text-light);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .font-amiri { font-family: 'Amiri', serif; }
+
+        /* Canvas Background */
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .page.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* Landing */
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .lang-btn {
+            padding: 1.2rem 3rem; margin: 0.75rem;
+            font-size: 1.1rem; font-weight: 600;
+            color: var(--text-light);
+            background: rgba(26, 42, 58, 0.9);
+            border: 2px solid var(--accent-gold);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .lang-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(201, 162, 39, 0.3); }
+        .lang-btn.selected { background: linear-gradient(135deg, var(--accent-gold), #a88520); color: var(--bg-dark); }
+
+        .next-btn {
+            padding: 1rem 3.5rem;
+            font-size: 1.1rem; font-weight: 600;
+            color: var(--bg-dark);
+            background: linear-gradient(135deg, var(--accent-gold), #d4af37);
+            border: none; border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .next-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Nav */
+        .nav-container {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(15, 32, 39, 0.95);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .nav-link {
+            padding: 0.5rem 1rem; color: var(--text-muted);
+            text-decoration: none; transition: color 0.3s;
+        }
+        .nav-link:hover { color: var(--accent-gold); }
+
+        /* Mobile Menu */
+        .mobile-menu-btn { display: none; flex-direction: column; gap: 5px; background: transparent; border: none; cursor: pointer; padding: 5px; }
+        .mobile-menu-btn span { width: 25px; height: 2px; background: var(--accent-gold); }
+        .mobile-menu { display: none; position: fixed; top: 70px; left: 0; right: 0; background: rgba(15, 32, 39, 0.98); padding: 1rem; flex-direction: column; z-index: 99; }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a { padding: 0.75rem 1rem; color: var(--text-light); text-decoration: none; }
+
+        @media (max-width: 1024px) {
+            .nav-links { display: none !important; }
+            .mobile-menu-btn { display: flex !important; }
+        }
+
+        /* Cards */
+        .section-card {
+            padding: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        .section-card:hover { transform: translateY(-8px); border-color: var(--accent-gold); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+
+        /* Content Page */
+        .content-page { padding-top: 100px; padding-bottom: 4rem; }
+        .content-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .content-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 3rem; }
+        .content-card h1 { font-family: 'Amiri', serif; font-size: 2.5rem; color: var(--accent-gold); margin-bottom: 2rem; text-align: center; }
+        .content-card h2 { font-family: 'Amiri', serif; font-size: 1.6rem; color: var(--accent-gold-light); margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+        .content-card h3 { font-size: 1.3rem; color: var(--glow-green); margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .content-card p { line-height: 1.9; margin-bottom: 1.25rem; opacity: 0.95; }
+        .content-card ol, .content-card ul { margin-left: 1.5rem; margin-bottom: 1.25rem; }
+        .content-card li { line-height: 1.8; margin-bottom: 0.5rem; opacity: 0.95; }
+
+        /* Surah List Grid */
+        .surah-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .surah-item {
+            background: rgba(201, 162, 39, 0.1);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .surah-item:hover { background: rgba(201, 162, 39, 0.2); transform: translateY(-3px); }
+        .surah-item h4 { color: var(--accent-gold); font-family: 'Amiri', serif; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .surah-item p { font-size: 0.9rem; opacity: 0.8; }
+
+        /* Arabic & Urdu Text */
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            font-size: 2rem;
+            text-align: right;
+            direction: rtl;
+            color: var(--accent-gold-light);
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            line-height: 2.2;
+        }
+        .urdu-translation {
+            font-family: 'Amiri', serif;
+            font-size: 1.1rem;
+            text-align: right;
+            direction: rtl;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            padding-right: 1rem;
+            border-right: 3px solid var(--glow-green);
+            line-height: 1.8;
+        }
+
+        /* Owner Text Stylish Card */
+        .owner-stylish-box {
+            border: 2px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.1), rgba(10, 61, 46, 0.2));
+            margin: 2rem auto;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .owner-stylish-box h3 {
+            color: var(--accent-gold);
+            font-size: 1.8rem;
+            font-family: 'Amiri', serif;
+            margin-bottom: 1rem;
+        }
+        .owner-stylish-box p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* Prayer Table */
+        .prayer-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 1rem; }
+        .prayer-table th, .prayer-table td { padding: 1rem; text-align: center; border-bottom: 1px solid rgba(201, 162, 39, 0.3); }
+        .prayer-table th { background: rgba(201, 162, 39, 0.15); color: var(--accent-gold); font-family: 'Amiri', serif; }
+        .prayer-table td:first-child { color: var(--accent-gold-light); font-weight: bold; }
+        .prayer-table tr:hover { background: rgba(255,255,255,0.05); }
+
+        /* Back Button */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--accent-gold);
+            background: transparent; border: 1px solid var(--accent-gold);
+            border-radius: 8px; cursor: pointer; margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover { background: rgba(201, 162, 39, 0.1); }
+
+        /* Reveal Animation */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <!-- Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Landing Page -->
+    <div id="landingPage" class="page active">
+        <div class="landing-container">
+            <h1 class="font-amiri text-4xl md:text-6xl text-center mb-4 reveal" style="color: var(--accent-gold);">
+                <span>Welcome to Islamic Education</span>
+            </h1>
+            <p class="text-lg md:text-xl mb-12 opacity-80 reveal stagger-1">Learn about the beauty of Islam</p>
+            
+            <div class="mb-8 reveal stagger-2">
+                <button class="lang-btn" data-lang="en" id="langEnBtn">English Language</button>
+                <button class="lang-btn" data-lang="ur" id="langUrBtn">Urdu Language</button>
+            </div>
+            
+            <!-- Stylish Owner Box -->
+            <div class="reveal stagger-3 owner-stylish-box">
+                <h3>Website Owner</h3>
+                <p>
+                    <strong>Muhammad Zeeshan</strong><br>
+                    His two friends <strong>Rabnawaz</strong> and <strong>Abdullah Sajjad</strong> also helped him.
+                </p>
+            </div>
+            
+            <button class="next-btn reveal stagger-4" id="nextBtn" disabled>Next</button>
+        </div>
+    </div>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page">
+        <nav class="nav-container" id="mainNav">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <a href="#" class="font-amiri text-xl" style="color: var(--accent-gold);">Islamic Education</a>
+                <div class="nav-links hidden md:flex gap-2">
+                    <a href="#" class="nav-link" data-section="home">Home</a>
+                    <a href="#" class="nav-link" data-section="accept-islam">Accept Islam</a>
+                    <a href="#" class="nav-link" data-section="main-things">Main Things</a>
+                    <a href="#" class="nav-link" data-section="prayers">Prayers</a>
+                    <a href="#" class="nav-link" data-section="surahs">Surahs</a>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+        
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#" data-section="home">Home</a>
+            <a href="#" data-section="accept-islam">Accept Islam</a>
+            <a href="#" data-section="main-things">Main Things</a>
+            <a href="#" data-section="prayers">Prayers</a>
+            <a href="#" data-section="surahs">Surahs</a>
+        </div>
+
+        <main class="pt-24 pb-16 px-4">
+            <div id="homeSection" class="section-content">
+                <div class="max-w-4xl mx-auto text-center mb-16">
+                    <h1 class="font-amiri text-4xl md:text-5xl mb-6 reveal" style="color: var(--accent-gold);">Learn About Islam</h1>
+                    <p class="text-xl opacity-80 reveal stagger-1">Muhammad Zeeshan will guide you</p>
+                </div>
+
+                <!-- Main 4 Cards -->
+                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <div class="section-card reveal stagger-1" data-section="accept-islam">
+                        <h3 class="font-amiri text-xl mb-2" style="color: var(--accent-gold-light);">How to Accept Islam</h3>
+                        <p class="text-sm opacity-70">Shahada guide</p>
+                    </div>
+                    <div class="section-card reveal stagger-2" data-section="main-things">
+                        <h3 class="font-amiri text-xl mb-2" style="color: var(--accent-gold-light);">Main Things</h3>
+                        <p class="text-sm opacity-70">Pillars & Faith</p>
+                    </div>
+                    <div class="section-card reveal stagger-3" data-section="prayers">
+                        <h3 class="font-amiri text-xl mb-2" style="color: var(--accent-gold-light);">Prayers Detail</h3>
+                        <p class="text-sm opacity-70">Namaz Rakats</p>
+                    </div>
+                    <div class="section-card reveal stagger-4" data-section="surahs">
+                        <h3 class="font-amiri text-xl mb-2" style="color: var(--accent-gold-light);">Surahs Section</h3>
+                        <p class="text-sm opacity-70">Last 10 Surahs</p>
+                    </div>
+                </div>
+
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="font-amiri text-2xl text-center mb-8 reveal" style="color: var(--accent-gold);">Explore More Topics</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="topicsGrid"></div>
+                </div>
+            </div>
+
+            <!-- Dynamic Content Section -->
+            <div id="dynamicContent" class="content-page hidden">
+                <div class="content-container">
+                    <button class="back-btn" id="backBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        <span>Back</span>
+                    </button>
+                    <div class="content-card" id="contentCard"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ===================== BACKGROUND ANIMATION =====================
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [], shapes = [], balls = [];
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initAnimations();
+        }
+
+        function initAnimations() {
+            stars = []; shapes = []; balls = [];
+            for(let i=0; i<80; i++) stars.push({ x: Math.random()*width, y: Math.random()*height, size: Math.random()*2, speed: Math.random()*0.5+0.2 });
+            for(let i=0; i<20; i++) shapes.push({ x: Math.random()*width, y: Math.random()*height, size: Math.random()*20+10, speed: Math.random()*1+0.5, rotation: 0, rotSpeed: (Math.random()-0.5)*0.02, sides: Math.random()>0.5 ? 5 : 6 });
+            for(let i=0; i<15; i++) balls.push({ x: Math.random()*width, y: Math.random()*height, radius: Math.random()*30+15, speed: Math.random()*0.8+0.4, color: ['rgba(201,162,39,0.2)', 'rgba(45,155,106,0.2)', 'rgba(100,200,255,0.2)', 'rgba(255,100,150,0.2)'][Math.floor(Math.random()*4)] });
+        }
+
+        function drawPolygon(x, y, r, sides, rot) {
+            ctx.beginPath();
+            for(let i=0; i<sides; i++) { const angle = (i*2*Math.PI/sides) + rot; ctx.lineTo(x + r*Math.cos(angle), y + r*Math.sin(angle)); }
+            ctx.closePath(); ctx.stroke();
+        }
+
+        function animateBg() {
+            ctx.clearRect(0, 0, width, height);
+            balls.forEach(b => {
+                ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2); ctx.fill();
+                if(!prefersReducedMotion) { b.y += b.speed; b.x += Math.sin(b.y*0.01)*0.5; if(b.y > height + b.radius) { b.y = -b.radius; b.x = Math.random()*width; } }
+            });
+            ctx.strokeStyle = 'rgba(201, 162, 39, 0.4)'; ctx.lineWidth = 1;
+            shapes.forEach(s => {
+                drawPolygon(s.x, s.y, s.size, s.sides, s.rotation);
+                if(!prefersReducedMotion) { s.y += s.speed; s.rotation += s.rotSpeed; if(s.y > height + s.size) { s.y = -s.size; s.x = Math.random()*width; } }
+            });
+            ctx.fillStyle = '#fff';
+            stars.forEach(s => {
+                ctx.globalAlpha = 0.5 + Math.sin(Date.now()*0.005+s.x)*0.5; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+                if(!prefersReducedMotion) { s.y += s.speed; if(s.y > height) { s.y = 0; s.x = Math.random()*width; } }
+            });
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(animateBg);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animateBg();
+
+        // ===================== CONTENT DATABASE =====================
+        const contentDB = {};
+
+        // 1. Accept Islam Content
+        contentDB['accept-islam'] = {
+            en: {
+                title: 'How to Accept Islam',
+                content: `
+                    <h2>The Path to Truth</h2>
+                    <p>Accepting Islam is a simple and beautiful process. It involves sincerely believing in the core tenets of faith and declaring them verbally.</p>
+                    
+                    <h3>The Shahada (Declaration of Faith)</h3>
+                    <div class="arabic-text">أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا ٱللَّٰهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ ٱللَّٰهِ</div>
+                    <p class="urdu-translation">ترجمہ: میں گواہی دیتا ہوں کہ اللہ کے سوا کوئی معبود نہیں اور میں گواہی دیتا ہوں کہ محمد اللہ کے رسول ہیں۔</p>
+                    
+                    <h3>Steps to Become a Muslim:</h3>
+                    <ol>
+                        <li><strong>Belief:</strong> Sincerely believe in the Oneness of Allah and that Muhammad (PBUH) is His final messenger.</li>
+                        <li><strong>Declaration:</strong> Recite the Shahada with conviction in Arabic or your native language.</li>
+                        <li><strong>Purification:</strong> It is recommended to take a bath (Ghusl) to symbolize spiritual purity.</li>
+                        <li><strong>Learning:</strong> Begin learning the basics of prayer and Islamic life.</li>
+                    </ol>
+                `
+            }
+        };
+
+        // 2. Main Things Content
+        contentDB['main-things'] = {
+            en: {
+                title: 'Main Things in Islam',
+                content: `
+                    <h2>The Five Pillars of Islam</h2>
+                    <ol>
+                        <li><strong>Shahada:</strong> Declaring there is no god but Allah and Muhammad is His messenger.</li>
+                        <li><strong>Salah:</strong> Performing five daily prayers.</li>
+                        <li><strong>Zakat:</strong> Giving 2.5% of savings to the poor annually.</li>
+                        <li><strong>Sawm:</strong> Fasting during the month of Ramadan.</li>
+                        <li><strong>Hajj:</strong> Pilgrimage to Makkah once in a lifetime.</li>
+                    </ol>
+                    
+                    <h2>Six Articles of Faith</h2>
+                    <ol>
+                        <li>Belief in Allah.</li>
+                        <li>Belief in the Angels.</li>
+                        <li>Belief in the Holy Books (Quran, Torah, Gospel, Psalms).</li>
+                        <li>Belief in the Prophets.</li>
+                        <li>Belief in the Day of Judgment.</li>
+                        <li>Belief in Divine Decree (Qadar).</li>
+                    </ol>
+                `
+            }
+        };
+
+        // 3. Prayers Content with Table
+        contentDB['prayers'] = {
+            en: {
+                title: 'Namaz Timings & Rakats',
+                content: `
+                    <p>Here is the complete detail of Rakats (units) for the five daily obligatory prayers.</p>
+                    
+                    <table class="prayer-table">
+                        <thead>
+                            <tr>
+                                <th>Prayer</th>
+                                <th>Time</th>
+                                <th>Sunnah (Before)</th>
+                                <th>Fard (Obligatory)</th>
+                                <th>Sunnah (After)</th>
+                                <th>Nafl</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Fajr</td>
+                                <td>Dawn</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>4</td>
+                            </tr>
+                            <tr>
+                                <td>Dhuhr</td>
+                                <td>After Noon</td>
+                                <td>4</td>
+                                <td>4</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>12</td>
+                            </tr>
+                            <tr>
+                                <td>Asr</td>
+                                <td>Late Afternoon</td>
+                                <td>4*</td>
+                                <td>4</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>8</td>
+                            </tr>
+                            <tr>
+                                <td>Maghrib</td>
+                                <td>Sunset</td>
+                                <td>-</td>
+                                <td>3</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>7</td>
+                            </tr>
+                            <tr>
+                                <td>Isha</td>
+                                <td>Night</td>
+                                <td>4</td>
+                                <td>4</td>
+                                <td>2</td>
+                                <td>3 Witr + 2</td>
+                                <td>17</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `
+            }
+        };
+
+        // 4. Surahs Section Content
+        contentDB['surahs'] = {
+            en: {
+                title: 'Last 10 Surahs of Quran',
+                content: `<p>Select a Surah below to read its Arabic text and Urdu translation.</p><div class="surah-grid" id="surahGrid"></div>`
+            }
+        };
+
+        // Surahs Detailed Data
+        const surahsData = [
+            { 
+                id: 's105', name: "Surah Al-Fil (The Elephant)", 
+                arabic: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ ۝ أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ ۝ وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ ۝ تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ ۝ فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍ", 
+                urdu: "ترجمہ: کیا آپ نے نہیں دیکھا کہ آپ کے رب نے ہاتھی والوں کے ساتھ کیا سلوک کیا؟ کیا ان کی چال کو غلط نتائج کا نشانہ نہیں بنایا؟ اور ان پر جھنڈوں کی جھنڈیں پرندے بھیجے۔ جو ان پر پتھروں سے ٹھیکہ لگاتی تھیں۔ پس ان کو کھایا ہوا بھوسا بنا دیا۔"
+            },
+            { 
+                id: 's106', name: "Surah Quraysh", 
+                arabic: "لِإِيلَافِ قُرَيْشٍ ۝ إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ ۝ فَلْيَعْبُدُوا رَبَّ هَٰذَا الْبَيْتِ ۝ الَّذِي أَطْعَمَهُم مِّن جُوعٍ وَآمَنَهُم مِّنْ خَوْفٍ", 
+                urdu: "ترجمہ: قریش کی الفت کے لیے۔ ان کی الفت سردی اور گرمی کے سفر کی۔ پس انہیں چاہیئے کہ اس گھر کے رب کی عبادت کریں۔ جس نے انہیں بھوک میں کھلایا اور خوف میں امن دیا۔"
+            },
+            { 
+                id: 's107', name: "Surah Al-Ma'un", 
+                arabic: "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ ۝ فَذَٰلِكَ الَّذِي يَدُعُّ الْيَتِيمَ ۝ وَلَا يَحُضُّ عَلَىٰ طَعَامِ الْمِسْكِينِ ۝ فَوَيْلٌ لِّلْمُصَلِّينَ ۝ الَّذِينَ هُمْ عَن صَلَاتِهِمْ سَاهُونَ ۝ الَّذِينَ هُمْ يُرَاءُونَ ۝ وَيَمْنَعُونَ الْمَاعُونَ", 
+                urdu: "ترجمہ: کیا آپ نے دیکھا جو شخص دین کو جھٹلاتا ہے؟ وہی تو ہے جو یتیم کو دھتکار دیتا ہے۔ اور محتاج کو کھانے کی ترغیب نہیں دیتا۔ پس ہلاک ہوں وہ نمازی۔ جو اپنی نماز سے غافل ہیں۔ جو ریا کرتے ہیں۔ اور ضرورت کی چیزوں سے روکتے ہیں۔"
+            },
+            { 
+                id: 's108', name: "Surah Al-Kawthar", 
+                arabic: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ ۝ فَصَلِّ لِرَبِّكَ وَانْحَرْ ۝ إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ", 
+                urdu: "ترجمہ: ہم نے آپ کو کوثر عطا کی۔ پس آپ اپنے رب کے لیے نماز پڑھیں اور قربانی کریں۔ بیشک آپ کا دشمن ہی بے نام و نشان ہے۔"
+            },
+            { 
+                id: 's109', name: "Surah Al-Kafirun", 
+                arabic: "قُلْ يَا أَيُّهَا الْكَافِرُونَ ۝ لَا أَعْبُدُ مَا تَعْبُدُونَ ۝ وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ ۝ وَلَا أَنَا عَابِدٌ مَّا عَبَدتُّمْ ۝ وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ ۝ لَكُمْ دِينُكُمْ وَلِيَ دِينِ", 
+                urdu: "ترجمہ: کہو اے کافرو! میں اس کی عبادت نہیں کرتا جس کی تم عبادت کرتے ہو۔ اور نہ تم اس کی عبادت کرتے ہو جس کی میں عبادت کرتا ہوں۔ اور نہ میں اس کی عبادت کرنے والا ہوں جس کی تم عبادت کر چکے ہو۔ تمہارا دین تمہارے لیے اور میرا دین میرے لیے۔"
+            },
+            { 
+                id: 's110', name: "Surah An-Nasr", 
+                arabic: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ ۝ وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا ۝ فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ ۚ إِنَّهُ كَانَ تَوَّابًا", 
+                urdu: "ترجمہ: جب اللہ کی مدد اور فتح آ جائے۔ اور آپ لوگوں کو اللہ کے دین میں جماعت در جماعت داخل ہوتے دیکھیں۔ تو اپنے رب کی حمد کے ساتھ تسبیح کریں اور اس سے بخشش مانگیں۔ بیشک وہ بہت بخشنے والا ہے۔"
+            },
+            { 
+                id: 's111', name: "Surah Al-Masad", 
+                arabic: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ ۝ مَا أَغْنَىٰ عَنْهُ مَالُهُ وَمَا كَسَبَ ۝ سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ ۝ وَامْرَأَتُهُ حَمَّالَةَ الْحَطَبِ ۝ فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ", 
+                urdu: "ترجمہ: ابولہب کے ہاتھ ٹوٹ گئے اور وہ ہلاک ہو گیا۔ اس کا مال اور وہ کچھ جو اس نے کمایا اس کو کچھ فائدہ نہ ہوا۔ عنقریب وہ شعلہ دار آگ میں جلے گا۔ اور اس کی بیوی بھی، لکڑی کی ڈھیر لے جانے والی۔ اس کے گلے میں کھجور کا رسا ہوگا۔"
+            },
+            { 
+                id: 's112', name: "Surah Al-Ikhlas", 
+                arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ", 
+                urdu: "ترجمہ: کہو وہ اللہ ایک ہے۔ اللہ بے نیاز ہے۔ نہ اس کی اولاد ہے نہ وہ پیدا کیا گیا ہے۔ اور کوئی اس کا ہمسر نہیں۔"
+            },
+            { 
+                id: 's113', name: "Surah Al-Falaq", 
+                arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِن شَرِّ مَا خَلَقَ ۝ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ", 
+                urdu: "ترجمہ: کہو میں پناہ مانگتا ہوں صبح کے رب کی۔ ہر چیز کے شر سے جسے اس نے پیدا کیا۔ اور اندھیری رات کے شر سے جب وہ چھا جائے۔ اور گرہوں میں پھونکنے والی عورتوں کے شر سے۔ اور حسد کرنے والے کے شر سے جب وہ حسد کرے۔"
+            },
+            { 
+                id: 's114', name: "Surah An-Nas", 
+                arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَٰهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ", 
+                urdu: "ترجمہ: کہو میں پناہ مانگتا ہوں لوگوں کے رب کی۔ لوگوں کے بادشاہ کی۔ لوگوں کے معبود کی۔ وسوسہ ڈالنے والے، چھپ جانے والے کے شر سے۔ جو لوگوں کے سینوں میں وسوسے ڈالتا ہے۔ جنات میں سے اور انسانوں میں سے۔"
+            }
+        ];
+
+        // Populate individual surahs in DB
+        surahsData.forEach(s => {
+            contentDB[s.id] = {
+                en: {
+                    title: s.name,
+                    content: `<h2>${s.name}</h2><div class="arabic-text">${s.arabic}</div><div class="urdu-translation">${s.urdu}</div>`
+                }
+            };
+        });
+
+        // Additional Topics Content (Detailed)
+        const additionalTopics = [
+            { id: 'wudu', title: 'Wudu Method', content: `<h2>Wudu (Ablution)</h2><p>Wudu is a ritual wash before prayer.</p><h3>Steps:</h3><ol><li>Wash hands up to wrists 3 times.</li><li>Rinse mouth and nose.</li><li>Wash face.</li><li>Wash arms to elbows.</li><li>Wipe head and ears.</li><li>Wash feet to ankles.</li></ol>` },
+            { id: 'ghusl', title: 'Ghusl Method', content: `<h2>Ghusl (Bath)</h2><p>Full body purification.</p><ol><li>Intention.</li><li>Wash private parts.</li><li>Rinse mouth and nose.</li><li>Pour water over whole body.</li></ol>` },
+            { id: 'tawheed', title: 'Tawheed', content: `<h2>Tawheed</h2><p>Belief in the Oneness of Allah in Lordship, Worship, and Names.</p>` },
+            { id: 'prophets', title: 'Prophets', content: `<h2>Prophets</h2><p>Belief in all Messengers from Adam to Muhammad (PBUH).</p>` },
+            { id: 'hereafter', title: 'Day of Judgment', content: `<h2>Day of Judgment</h2><p>Belief in resurrection, accountability, heaven, and hell.</p>` },
+            { id: 'quran', title: 'Holy Quran', content: `<h2>Holy Quran</h2><p>The final revelation revealed to Prophet Muhammad (PBUH).</p>` },
+            { id: 'hadith', title: 'Hadith', content: `<h2>Hadith</h2><p>The sayings and actions of Prophet Muhammad (PBUH).</p>` },
+            { id: 'zakat', title: 'Zakat', content: `<h2>Zakat</h2><p>Obligatory charity (2.5% of annual savings) for the poor.</p>` },
+            { id: 'fasting', title: 'Fasting', content: `<h2>Fasting (Sawm)</h2><p>Abstaining from food and drink from dawn to sunset in Ramadan.</p>` },
+            { id: 'hajj', title: 'Hajj', content: `<h2>Hajj</h2><p>Pilgrimage to Makkah, the 5th pillar of Islam.</p>` },
+            { id: 'ethics', title: 'Islamic Ethics', content: `<h2>Ethics</h2><p>Good character, honesty, and kindness.</p>` },
+            { id: 'parents', title: 'Rights of Parents', content: `<h2>Rights of Parents</h2><p>Respect, obedience, and serving parents is obligatory.</p>` }
+        ];
+
+        additionalTopics.forEach(t => contentDB[t.id] = { en: { title: t.title, content: t.content } });
+
+        // ===================== APP LOGIC =====================
+        const landingPage = document.getElementById('landingPage');
+        const homePage = document.getElementById('homePage');
+        const langEnBtn = document.getElementById('langEnBtn');
+        const langUrBtn = document.getElementById('langUrBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const topicsGrid = document.getElementById('topicsGrid');
+        const dynamicContent = document.getElementById('dynamicContent');
+        const homeSection = document.getElementById('homeSection');
+        const contentCard = document.getElementById('contentCard');
+        const backBtn = document.getElementById('backBtn');
+
+        function init() {
+            populateTopics();
+            setupEventListeners();
+            setupScrollReveal();
+        }
+
+        function populateTopics() {
+            topicsGrid.innerHTML = '';
+            additionalTopics.forEach((t, i) => {
+                const card = document.createElement('div');
+                card.className = 'section-card reveal stagger-' + ((i%3)+1);
+                card.dataset.section = t.id;
+                card.innerHTML = `<h3 class="font-amiri text-lg" style="color:var(--accent-gold-light)">${t.title}</h3>`;
+                topicsGrid.appendChild(card);
+            });
+        }
+
+        function setupEventListeners() {
+            langEnBtn.addEventListener('click', () => { langEnBtn.classList.add('selected'); langUrBtn.classList.remove('selected'); nextBtn.disabled = false; });
+            langUrBtn.addEventListener('click', () => { langUrBtn.classList.add('selected'); langEnBtn.classList.remove('selected'); nextBtn.disabled = false; });
+            
+            nextBtn.addEventListener('click', () => {
+                landingPage.classList.remove('active');
+                setTimeout(() => { landingPage.style.display = 'none'; homePage.classList.add('active'); }, 300);
+            });
+
+            backBtn.addEventListener('click', () => { dynamicContent.classList.add('hidden'); homeSection.classList.remove('hidden'); });
+            mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+
+            document.addEventListener('click', (e) => {
+                const card = e.target.closest('[data-section]');
+                if(card) {
+                    e.preventDefault();
+                    navigateToSection(card.dataset.section);
+                }
+            });
+        }
+
+        function navigateToSection(id) {
+            const data = contentDB[id];
+            if(data) {
+                contentCard.innerHTML = `<h1>${data.en.title}</h1>${data.en.content}`;
+                
+                // If Surahs, generate grid
+                if(id === 'surahs') {
+                    const grid = document.getElementById('surahGrid');
+                    if(grid) {
+                        surahsData.forEach(s => {
+                            const div = document.createElement('div');
+                            div.className = 'surah-item';
+                            div.dataset.section = s.id;
+                            div.innerHTML = `<h4>${s.name.split('(')[0]}</h4><p>Click to read</p>`;
+                            grid.appendChild(div);
+                        });
+                    }
+                }
+                
+                homeSection.classList.add('hidden');
+                dynamicContent.classList.remove('hidden');
+                mobileMenu.classList.remove('open');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function setupScrollReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('visible'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        init();
+    </script>
+</body>
+</html>
